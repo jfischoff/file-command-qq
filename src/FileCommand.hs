@@ -1,7 +1,7 @@
 {-# LANGUAGE TemplateHaskell #-} 
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE LambdaCase #-}
-module FileCommand where
+module FileCommand (s) where
 import Text.Parsec hiding ((<|>), many)
 import Text.Parsec.Char
 import Text.Parsec.Combinator
@@ -99,6 +99,41 @@ evalFilePart filePathName = \case
                       $ extension $(varE filePathName) 
                    |]
 
+
+-- | A simple quasiquoter for executing system commands on a filepath
+--  for example
+--  
+--  >>> [s|echo $filename|] "/home/test/thing.txt"
+--  
+--  will return
+--  
+--  @
+--   thing.txt
+--   ExitSuccess
+--  @
+--  
+--  You can think of @[s|echo $filename|]@ essentially converts into
+--  
+--  @
+--    \\path -> system $ "echo" ++ encodeString (filename path)
+--  @
+--  
+--  Here is another example
+--  
+--  >>> [s|gcc $path -o $directory$basename.o|] "/home/test/thing.c"
+--  
+--  All "file parts" start with a \'$\'. The \'$\' can be escaped by preceding it with a \'\\\'
+--  
+--  There are the following options for "file parts" 
+--  
+--  * $path
+--  * $root
+--  * $directory
+--  * $parent
+--  * $filename
+--  * $dirname
+--  * $basename
+--  * $ext
 s :: QuasiQuoter 
 s = QuasiQuoter 
      { quoteExp  = either (error . show) eval . parse parser "" 

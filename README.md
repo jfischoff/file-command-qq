@@ -24,7 +24,7 @@ You can think of `[s|echo $filename|]` essentially converts into
 
 All "file parts" start with a '$'. The '$' can be escaped by preceding it with a '\'
 
-There are the following options for "file parts"
+There are the following options for "file parts" 
 
 
 * $path
