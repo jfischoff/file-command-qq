@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                file-command-qq
-version:             0.1.0.3
+version:             0.1.0.4
 synopsis:            Quasiquoter for system commands involving filepaths
 description:
  file-command-qq is a simple quasiquoter for running system commands that take a filepath as an argument.
@@ -33,9 +33,9 @@ description:
  .
  >> [s|gcc $path -o $directory$basename.o|] "/home/test/thing.c"
  .
- All "file parts" start with a \'$\'. The \'$\' can be escaped by preceding it with a \'\\\'
+ All \"file parts\" start with a \'$\'. The \'$\' can be escaped by preceding it with a \'\\\'
  .
- There are the following options for "file parts" 
+ There are the following options for \"file parts\" 
  .
  .
    * $path

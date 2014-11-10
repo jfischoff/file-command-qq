@@ -122,7 +122,7 @@ evalFilePart filePathName = \case
 --  
 --  >> [s|gcc $path -o $directory$basename.o|] "/home/test/thing.c"
 --  
---  All "file parts" start with a \'$\'. The \'$\' can be escaped by preceding it with a \'\\\'
+--  All \"file parts\" start with a \'$\'. The \'$\' can be escaped by preceding it with a \'\\\'
 --  
 --  There are the following options for "file parts" 
 --  
