@@ -103,7 +103,7 @@ evalFilePart filePathName = \case
 -- | A simple quasiquoter for executing system commands on a filepath
 --  for example
 --  
---  >>> [s|echo $filename|] "/home/test/thing.txt"
+--  >> [s|echo $filename|] "/home/test/thing.txt"
 --  
 --  will return
 --  
@@ -120,7 +120,7 @@ evalFilePart filePathName = \case
 --  
 --  Here is another example
 --  
---  >>> [s|gcc $path -o $directory$basename.o|] "/home/test/thing.c"
+--  >> [s|gcc $path -o $directory$basename.o|] "/home/test/thing.c"
 --  
 --  All "file parts" start with a \'$\'. The \'$\' can be escaped by preceding it with a \'\\\'
 --  
