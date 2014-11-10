@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                file-command-qq
-version:             0.1.0.0
+version:             0.1.0.1
 synopsis:            Quasiquoter for system commands involving filepaths
 description:
  file-command-qq is a simple quasiquoter for running system commands that take a filepath as an argument.
