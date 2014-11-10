@@ -43,10 +43,10 @@ pFilePart'
   <|> BaseName  <$ string "basename"
   <|> Ext       <$ string "ext"
       
-type Cmd = String
+type Fragment = String
 
-pCmd :: Parser Cmd
-pCmd = do 
+pFragment :: Parser Fragment
+pFragment = do 
   frag <- many $ noneOf "\\$"
   xs <- option [] $ try $ do 
     slash <- char '\\'
@@ -60,12 +60,12 @@ pCmd = do
     xs'   -> return $ frag ++ xs'
 
 data Expr 
-  = ECmd      Cmd
+  = EFragment      Fragment
   | EFilePart FilePart
   deriving (Show, Eq)
 
 pExpr :: Parser Expr
-pExpr = EFilePart <$> pFilePart <|> ECmd <$> pCmd 
+pExpr = EFilePart <$> pFilePart <|> EFragment <$> pFragment 
 
 parser :: Parser [Expr]
 parser = many1 pExpr
@@ -79,7 +79,7 @@ eval xs = do
 
 evalExpr :: Name -> Expr -> Q Exp
 evalExpr filePathName = \case
-  ECmd      frag     -> [| $(stringE frag) |]
+  EFragment      frag     -> [| $(stringE frag) |]
   EFilePart filePart -> evalFilePart filePathName filePart
   
 evalFilePart :: Name -> FilePart -> Q Exp 
