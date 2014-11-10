@@ -14,20 +14,9 @@ import System.Process
 import Filesystem.Path hiding (null, concat)
 import Filesystem.Path.CurrentOS (encodeString)
 import Data.Maybe
+import qualified Data.Text as T
 
 type Parser = Parsec String ()
-
--- I need parse everything but $
--- unless it is proceeded by a \
--- unless \ is proceeded by a \
--- ?
-
--- so read until \ or $ 
--- if I hit a \ lookahead 
--- if I see a $
--- then it is a string '$'
--- if I see anything else print the '\' and the next character
--- if I see a $ treat the next bit as FilePart
 
 data FilePart 
   = Path     
@@ -58,14 +47,17 @@ type Cmd = String
 
 pCmd :: Parser Cmd
 pCmd = do 
-  frag <- many $ noneOf ['\\', '$']
-  xs <- option [] $ try $ (\x y -> x:y:[]) <$> char '\\' <*> anyChar
+  frag <- many $ noneOf "\\$"
+  xs <- option [] $ try $ do 
+    slash <- char '\\'
+    c     <- anyChar
+    return $ [slash, c]
   case xs of 
     [] 
      | null frag -> fail "empty cmd fragment"
      | otherwise -> return frag
-    "\\$" -> fmap (\x -> frag ++ "$" ++ x) pCmd
-    xs'  -> fmap (\x -> frag ++ xs' ++ x) pCmd
+    "\\$" -> return $ frag ++ "$"
+    xs'   -> return $ frag ++ xs'
 
 data Expr 
   = ECmd      Cmd
@@ -92,15 +84,20 @@ evalExpr filePathName = \case
   
 evalFilePart :: Name -> FilePart -> Q Exp 
 evalFilePart filePathName = \case
-  Path         -> [| $(varE filePathName) |]
+  Path         -> [| encodeString $ $(varE filePathName) |]
   Root         -> [| encodeString $ root      $(varE filePathName) |]
   Directory    -> [| encodeString $ directory $(varE filePathName) |]
   Parent       -> [| encodeString $ parent    $(varE filePathName) |]
   FileName     -> [| encodeString $ filename  $(varE filePathName) |]
   DirName      -> [| encodeString $ dirname   $(varE filePathName) |]
   BaseName     -> [| encodeString $ basename  $(varE filePathName) |]
-  Ext          -> [| encodeString $ fromMaybe ("Failed to get extension for " ++ $(varE filePathName))
-                   $ extension $(varE filePathName) |]
+  Ext          -> [| T.unpack 
+                   $ fromMaybe 
+                      (error 
+                      $ "Failed to get extension for " ++ encodeString $(varE filePathName)
+                      )
+                      $ extension $(varE filePathName) 
+                   |]
 
 s :: QuasiQuoter 
 s = QuasiQuoter 
@@ -109,16 +106,3 @@ s = QuasiQuoter
      , quoteType = error "s quoteType not implemented"
      , quoteDec  = error "s quoteDec not implemented"
      }
-
-
-
-
-
-
-
-
-
-
-
-
-
